@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import fetch from "node-fetch";
 import { checkPlatform } from "../utils/platform";
 import {

@@ -74,7 +74,7 @@ class UpdateService {
     // Get the latest version from the cache
     const latest = await CacheService.getInstance().load();
 
-    // Check platform for appropiate aliases
+    // Check platform for appropriate aliases
     platform = checkAlias(platform);
 
     if (!platform) {

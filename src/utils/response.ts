@@ -6,6 +6,11 @@ export class ServiceError extends Error {
   }
 }
 
+/**
+ * Formats error and sends response.
+ * @param res server response object
+ * @param error server error object
+ */
 export function sendError(res: Response, error: ServiceError) {
   if (!error.statusCode || error.statusCode >= 500) {
     console.error(error);

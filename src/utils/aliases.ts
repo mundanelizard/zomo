@@ -14,6 +14,11 @@ for (const existingPlatform of Object.keys(aliases)) {
   );
 }
 
+/**
+ * Matches platform alias to platform name
+ * @param platform 
+ * @returns 
+ */
 export function checkAlias(platform: string) {
   if (typeof aliases[platform] !== "undefined") {
     return platform;
@@ -28,4 +33,4 @@ export function checkAlias(platform: string) {
   }
 
   return '';
-};
+}
