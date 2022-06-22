@@ -1,11 +1,6 @@
 import fetch from "node-fetch";
 import { TOKEN } from "../config";
-
-class ProxyError extends Error {
-  constructor(public statusCode: number, public message: string) {
-    super(message);
-  }
-}
+import { ServiceError } from "../utils";
 
 class ProxyService {
   private static proxyService: ProxyService;
@@ -22,7 +17,7 @@ class ProxyService {
 
   async proxy(url: string) {
     if (!url) {
-      new ProxyError(400, "Bad Request");
+      new ServiceError(400, "Bad Request");
     }
 
     const options = {
@@ -39,7 +34,7 @@ class ProxyService {
     const newLocation = r.headers.get("Location");
 
     if (!newLocation) {
-      throw new ProxyError(404, "Not Found");
+      throw new ServiceError(404, "Not Found");
     }
 
     return {

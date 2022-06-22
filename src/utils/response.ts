@@ -1,9 +1,18 @@
-import { Response,  } from "express";
+import { Response } from "express";
 
-export function sendError(res: Response, error: Error) {
-
+export class ServiceError extends Error {
+  constructor(public readonly statusCode: number, public message: string) {
+    super(message);
+  }
 }
 
-export function sendSuccess(res: Response, body: any, others?: string | Record<string, any>, status: number = 200) {
+export function sendError(res: Response, error: ServiceError) {
+  if (!error.statusCode || error.statusCode >= 500) {
+    console.error(error);
+  }
 
+  res.status(error.statusCode || 500).send({
+    message: error.message,
+    success: false,
+  });
 }

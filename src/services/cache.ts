@@ -1,4 +1,5 @@
-import fetch from "node-fetch"
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import fetch from "node-fetch";
 import { checkPlatform } from "../utils/platform";
 import {
   ACCOUNT,
@@ -8,17 +9,12 @@ import {
   PRE,
   INTERVAL,
 } from "../config";
-
-class CacheError extends Error {
-  constructor(public statusCode: number, public message: string) {
-    super(message);
-  }
-}
+import { ServiceError } from "../utils";
 
 class CacheService {
   private static cacheService: CacheService;
   private latest: Record<string, any> = {};
-  private lastUpdate: any = null;
+  private lastUpdate = 0;
 
   private constructor() {}
 
@@ -32,7 +28,7 @@ class CacheService {
 
   async hardRefreshCache() {
     this.latest = {};
-    this.lastUpdate = null;
+    this.lastUpdate = 0;
     this.refresh();
   }
 
@@ -46,17 +42,17 @@ class CacheService {
     const response = await fetch(assetUrl, { headers });
 
     if (response.status !== 200) {
-      throw new CacheError(
+      throw new ServiceError(
         response.status,
         `Unable to cache RELEASES: Can't fetch ${url}.`
       );
     }
 
-    let content = await response.text();
+    const content = await response.text();
     const matches = content.match(/[^ ]*\.nupkg/gim);
 
     if (matches?.length === 0 || !matches) {
-      throw new CacheError(
+      throw new ServiceError(
         400,
         `Unable to cache RELEASES: ${url} has no body.`
       );
@@ -82,7 +78,7 @@ class CacheService {
     const response = await fetch(url, { headers });
 
     if (response.status !== 200) {
-      throw new CacheError(
+      throw new ServiceError(
         response.status,
         `GitHub API responded with ${response.status} for url ${url}`
       );
@@ -106,11 +102,11 @@ class CacheService {
     const { tag_name: tagName } = release;
 
     if (this.latest.version === tagName) {
-      console.log("Cached version is the same as latest");
       this.lastUpdate = Date.now();
       return;
     }
 
+    console.log(`Caching ${tagName}`);
     // updating cache
     this.latest.version = tagName;
     this.latest.notes = release.body;
@@ -122,6 +118,7 @@ class CacheService {
     );
 
     for (const asset of release.assets) {
+      // eslint-disable-next-line @typescript-eslint/no-shadow
       const { name, browser_download_url, url, content_type, size } = asset;
 
       if (name === "RELEASES") {
@@ -150,7 +147,7 @@ class CacheService {
       };
     }
 
-    console.log(`Finished caching version ${tagName}`);
+    console.log(`Cached ${tagName}`);
     this.lastUpdate = Date.now();
   }
 
