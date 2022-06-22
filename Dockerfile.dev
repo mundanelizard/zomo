@@ -1,0 +1,12 @@
+FROM node:latest
+
+WORKDIR /app
+
+COPY package.json .
+COPY package-lock.json .
+
+RUN npm i && npm i -g nodemon
+
+COPY . .
+
+CMD ["nodemon", "--exec", "npm", "run", "docker"]
